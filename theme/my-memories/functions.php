@@ -50,6 +50,10 @@ add_action( 'wp_body_open', function () {
 /* ---------------------------------------------------------------- WooCommerce: โชว์สินค้า สั่งทาง LINE */
 
 add_filter( 'woocommerce_is_purchasable', '__return_false' );
+// ไม่มีตะกร้า จึงไม่ให้ WooCommerce แทรกไอคอนตะกร้า/บัญชีลูกค้าลง header
+add_filter( 'hooked_block_types', fn( $blocks ) => array_values( array_diff( $blocks, [ 'woocommerce/mini-cart', 'woocommerce/customer-account' ] ) ), 99 );
+// ซ่อนแถบ admin หน้าเว็บ ให้ลูกค้าเห็นเหมือนเว็บจริง (เข้าหลังบ้านที่ /wp-admin)
+add_filter( 'show_admin_bar', '__return_false' );
 add_filter( 'woocommerce_show_page_title', '__return_false' );
 add_filter( 'woocommerce_product_add_to_cart_text', fn() => 'ดูรายละเอียด' );
 remove_action( 'woocommerce_before_main_content', 'woocommerce_breadcrumb', 20 );
