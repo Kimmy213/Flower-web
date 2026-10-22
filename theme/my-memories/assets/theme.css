@@ -191,7 +191,7 @@ img { max-width: 100%; height: auto; }
   .mm-card-title { font-size: 1.2rem; }
   .mm-footer-grid { grid-template-columns: 1fr; gap: 32px; }
   .mm-hero { min-height: 460px !important; }
-  .mm-hero .wp-block-cover__image-background { object-position: 70% center; opacity: .55; }
+  .mm-hero .wp-block-cover__image-background { object-position: 70% center; }
   .woocommerce .woocommerce-ordering, .woocommerce .woocommerce-result-count { float: none !important; text-align: center; }
 }
 
@@ -213,7 +213,7 @@ img { max-width: 100%; height: auto; }
   .mm-nav .is-menu-open .wp-block-navigation-submenu__toggle { display: none; }
 }
 @media (max-width: 1100px) {
-  .mm-hero .wp-block-cover__image-background { object-position: 75% center; opacity: .5; }
+  .mm-hero .wp-block-cover__image-background { object-position: 75% center; }
 }
 
 /* ไล่สีจางด้านซ้ายของภาพปก ให้อ่านข้อความออกไม่ว่าร้านจะใส่รูปอะไร */
@@ -222,5 +222,5 @@ img { max-width: 100%; height: auto; }
   background: linear-gradient(90deg, rgb(251 248 244 / .94) 0%, rgb(251 248 244 / .7) 42%, rgb(251 248 244 / 0) 72%) !important;
 }
 @media (max-width: 781px) {
-  .mm-hero .wp-block-cover__background { background: rgb(251 248 244 / .72) !important; }
+  .mm-hero .wp-block-cover__background { background: linear-gradient(180deg, rgb(251 248 244 / .85) 0%, rgb(251 248 244 / .55) 100%) !important; }
 }
