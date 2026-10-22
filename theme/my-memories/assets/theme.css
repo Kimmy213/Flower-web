@@ -277,3 +277,24 @@ img { max-width: 100%; height: auto; }
   .mm-mosaic.wp-block-gallery { grid-template-columns: repeat(2, 1fr); }
   .mm-form { grid-template-columns: 1fr; }
 }
+
+/* ปุ่ม ‹ › และการลากของแถวรูป */
+.mm-strip-wrap { position: relative; min-width: 0; }
+.mm-strip.wp-block-gallery { cursor: grab; user-select: none; }
+.mm-strip.wp-block-gallery.is-dragging { cursor: grabbing; scroll-snap-type: none; scroll-behavior: auto; }
+.mm-strip.wp-block-gallery img { pointer-events: none; }
+.mm-strip-btn {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 2;
+  width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--mm-line); cursor: pointer;
+  background: rgb(255 255 255 / .92); color: var(--mm-ink); font-size: 28px; line-height: 1; padding: 0 0 4px;
+  box-shadow: 0 6px 20px rgb(58 46 46 / .12); transition: opacity .2s, background .2s;
+}
+.mm-strip-btn:hover { background: #fff; color: var(--mm-rose-dark); }
+.mm-strip-btn:focus-visible { outline: 2px solid var(--mm-rose); outline-offset: 2px; }
+.mm-strip-btn.prev { left: 12px; }
+.mm-strip-btn.next { right: 28px; }
+.mm-strip-wrap.at-start .mm-strip-btn.prev, .mm-strip-wrap.at-end .mm-strip-btn.next { opacity: 0; pointer-events: none; }
+@media (max-width: 781px) {
+  .mm-strip-btn { width: 40px; height: 40px; font-size: 24px; }
+  .mm-strip-btn.next { right: 12px; }
+}

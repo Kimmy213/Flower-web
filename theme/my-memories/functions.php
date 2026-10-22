@@ -49,7 +49,8 @@ add_action( 'after_setup_theme', function () {
 
 add_action( 'wp_enqueue_scripts', function () {
 	wp_enqueue_style( 'mm-fonts', 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Serif+Thai:wght@500;600&family=Noto+Sans+Thai:wght@300;400;500;600&display=swap', [], null );
-	wp_enqueue_style( 'mm-theme', get_theme_file_uri( 'assets/theme.css' ), [], wp_get_theme()->get( 'Version' ) );
+	// version = เวลาแก้ไฟล์ล่าสุด เบราว์เซอร์จะได้ไม่ใช้ CSS เก่าจาก cache
+	wp_enqueue_style( 'mm-theme', get_theme_file_uri( 'assets/theme.css' ), [], (string) filemtime( get_theme_file_path( 'assets/theme.css' ) ) );
 } );
 
 add_action( 'wp_body_open', function () {
@@ -305,6 +306,60 @@ add_shortcode( 'mm_event_form', function ( $atts ) {
 add_action( 'wp_footer', function () {
 	?>
 	<script>
+	// แถวรูปเลื่อนข้าง: ปุ่ม ‹ › และกดเมาส์ค้างลากได้ (บนมือถือปัดนิ้วได้อยู่แล้ว)
+	document.querySelectorAll('.mm-strip').forEach(function (strip) {
+		var wrap = document.createElement('div');
+		wrap.className = 'mm-strip-wrap';
+		strip.parentNode.insertBefore(wrap, strip);
+		wrap.appendChild(strip);
+		var step = function () {
+			var item = strip.querySelector('.wp-block-image');
+			return item ? item.getBoundingClientRect().width + 18 : strip.clientWidth * 0.8;
+		};
+		[['prev', '‹', 'รูปก่อนหน้า', -1], ['next', '›', 'รูปถัดไป', 1]].forEach(function (b) {
+			var btn = document.createElement('button');
+			btn.type = 'button';
+			btn.className = 'mm-strip-btn ' + b[0];
+			btn.textContent = b[1];
+			btn.setAttribute('aria-label', b[2]);
+			btn.addEventListener('click', function () {
+				var from = strip.scrollLeft, to = from + b[3] * step();
+				strip.scrollTo({ left: to, behavior: 'smooth' });
+				// บางเบราว์เซอร์/แท็บพื้นหลังไม่เล่น smooth scroll ถ้ายังไม่ขยับ ให้กระโดดไปเลย
+				setTimeout(function () { if (Math.abs(strip.scrollLeft - from) < 2) strip.scrollLeft = to; }, 450);
+			});
+			wrap.appendChild(btn);
+		});
+		var update = function () {
+			var max = strip.scrollWidth - strip.clientWidth - 2;
+			wrap.classList.toggle('at-start', strip.scrollLeft <= 2);
+			wrap.classList.toggle('at-end', strip.scrollLeft >= max);
+		};
+		strip.addEventListener('scroll', update, { passive: true });
+		window.addEventListener('resize', update);
+		update();
+
+		var down = false, startX = 0, startLeft = 0, moved = false;
+		strip.addEventListener('pointerdown', function (e) {
+			if (e.pointerType !== 'mouse') return;
+			down = true; moved = false; startX = e.clientX; startLeft = strip.scrollLeft;
+			strip.classList.add('is-dragging');
+		});
+		window.addEventListener('pointermove', function (e) {
+			if (!down) return;
+			var dx = e.clientX - startX;
+			if (Math.abs(dx) > 4) moved = true;
+			strip.scrollLeft = startLeft - dx;
+		});
+		window.addEventListener('pointerup', function () {
+			if (!down) return;
+			down = false;
+			strip.classList.remove('is-dragging');
+		});
+		strip.addEventListener('click', function (e) { if (moved) { e.preventDefault(); e.stopPropagation(); } }, true);
+		strip.addEventListener('dragstart', function (e) { e.preventDefault(); });
+	});
+
 	document.querySelectorAll('.mm-form').forEach(function (form) {
 		form.addEventListener('submit', function (e) {
 			e.preventDefault();
