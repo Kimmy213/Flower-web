@@ -33,12 +33,21 @@
       }
     },
     {
+      "step": "setSiteLanguage",
+      "language": "th"
+    },
+    {
       "step": "activateTheme",
       "themeFolderName": "my-memories"
     },
     {
       "step": "runPHP",
       "code": "<?php require '/wordpress/wp-load.php'; require get_theme_file_path('demo/setup.php'); mm_demo_setup();"
+    },
+    {
+      "step": "login",
+      "username": "myshop",
+      "password": "mymemories2026"
     }
   ]
 }

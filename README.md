@@ -18,12 +18,34 @@
 
 รูปสินค้าและราคาเป็น **ข้อมูลตัวอย่าง** (รูปวาด) ทั้งหมด
 
+## หลังบ้าน (ร้านแก้เองได้ทั้งหมด ไม่ต้องแตะโค้ด)
+
+พิมพ์ `/wp-admin` ในช่อง URL ด้านล่างของ Playground ลิงก์ showcase login เป็นบัญชีร้านให้อัตโนมัติ
+
+| บัญชี | username / password | เห็นอะไร |
+|---|---|---|
+| ร้าน (shop_manager) | `myshop` / `mymemories2026` | หลังบ้านแบบย่อ: แผงควบคุมปุ่มลัด, ข้อมูลร้าน, สินค้า, หน้า, สื่อ |
+| Kim (admin) | `admin` / `password` (ค่าเริ่มต้นของ Playground) | ทุกอย่าง (ออกจากระบบบัญชีร้านก่อน) |
+
+รหัสผ่านพวกนี้ใช้กับ showcase บน Playground เท่านั้น ตอนขึ้น hosting จริงต้องตั้งใหม่
+
+| ร้านอยากแก้ | ทำที่ |
+|---|---|
+| เบอร์, LINE, IG, FB, TikTok, ที่อยู่, เวลาเปิด, แผนที่, แถบ Showcase | เมนู **ข้อมูลร้าน** |
+| เพิ่ม/ลบ/แก้สินค้า, ราคา | **สินค้า** (ติ๊กหมวดและประเภทข้างขวา) |
+| สินค้าขึ้น Best Sellers หน้าแรก | กดดาว ☆ ในรายการสินค้า |
+| ประเภทสินค้า (ช่อ กล่อง …) | สินค้า → **ประเภทสินค้า** ลากเรียงลำดับได้ |
+| หมวด + เมนูด้านบน + การ์ดหน้าแรก | สินค้า → **หมวดหมู่** เพิ่มหมวดแล้วขึ้นเมนูและการ์ดเอง รูปการ์ด = ภาพย่อของหมวด คำใต้การ์ด = วลีแรกของคำอธิบาย |
+| ข้อความ/รูป/แกลเลอรีในหน้า Home, Event, Customers | **หน้า** → แก้ไข (block editor) |
+| การ์ด Event/Party และ Client/Celebrity/… | รูปเด่น + ข้อความสรุป (excerpt) ของหน้าย่อยนั้น เพิ่มหน้าย่อยใหม่แล้วขึ้นการ์ดและเมนูเอง |
+
 ## โครงสร้าง
 
 ```
 blueprint.json          บอก Playground ให้ติดตั้ง WooCommerce + theme แล้วรัน demo/setup.php
 theme/my-memories/      block theme
-  functions.php         ข้อมูลร้าน (mm_shop), ปุ่ม LINE, ตัวกรอง, footer
+  functions.php         ค่าเริ่มต้นข้อมูลร้าน, ประเภทสินค้า, เมนูอัตโนมัติ, ตัวกรอง, footer
+  inc/admin.php         หน้า "ข้อมูลร้าน" และหลังบ้านแบบย่อของบัญชีร้าน
   assets/theme.css      สไตล์ทั้งหมด
   demo/setup.php        สร้างหมวด สินค้า หน้า และเมนู
 data/products.json      รายการสินค้าตัวอย่าง
@@ -42,6 +64,6 @@ npx @wp-playground/cli@3.1.0 server --port=9400 --blueprint=blueprint-local.json
 
 ## ข้อควรรู้
 
-- attribute ประเภทสินค้าใช้ slug `arrangement` (ตัวกรองคือ `?filter_arrangement=box`) เพราะ WooCommerce จอง slug `type` ไว้
+- ประเภทสินค้าเป็น taxonomy `mm_arrangement` (ตัวกรองคือ `?arrangement=box`) ไม่ใช้ product attribute เพราะร้านต้องกดหลายขั้น และ WooCommerce จอง slug `type`
 - header ห้ามใช้ `backdrop-filter` เพราะจะขังเมนูมือถือไว้ในกรอบ header
 - CLI เวอร์ชันล่าสุดต้องใช้ Node 24 เครื่องนี้มี Node 22 จึง pin ไว้ที่ `@wp-playground/cli@3.1.0`
