@@ -1,0 +1,18 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "meta": {
+    "title": "My Memories Flower Shop — showcase",
+    "description": "WordPress + WooCommerce showcase for My Memories Flower Shop",
+    "author": "Kimmy213"
+  },
+  "landingPage": "/",
+  "preferredVersions": { "php": "8.3", "wp": "latest" },
+  "features": { "networking": true },
+  "login": false,
+  "steps": [
+    { "step": "setSiteOptions", "options": { "permalink_structure": "/%postname%/", "blogname": "My Memories Flower Shop" } },
+    { "step": "installPlugin", "pluginData": { "resource": "wordpress.org/plugins", "slug": "woocommerce" }, "options": { "activate": true } },
+    { "step": "installTheme", "themeData": { "resource": "url", "url": "https://raw.githubusercontent.com/Kimmy213/Flower-web/main/dist/my-memories.zip" }, "options": { "activate": true } },
+    { "step": "runPHP", "code": "<?php require '/wordpress/wp-load.php'; require get_theme_file_path('demo/setup.php'); mm_demo_setup();" }
+  ]
+}
