@@ -40,7 +40,7 @@
       "step": "installTheme",
       "themeData": {
         "resource": "url",
-        "url": "https://raw.githubusercontent.com/Kimmy213/Flower-web/main/dist/my-memories.zip"
+        "url": "https://raw.githubusercontent.com/Kimmy213/Flower-web/main/dist/my-memories.zip?v=59116a03b5"
       },
       "options": {
         "activate": true

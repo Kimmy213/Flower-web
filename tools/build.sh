@@ -10,8 +10,15 @@ cp "$ROOT/data/products.json" "$THEME/demo/products.json"
 rm -f "$ROOT/dist/my-memories.zip"
 (cd "$ROOT/theme" && zip -qr -X "$ROOT/dist/my-memories.zip" my-memories -x '*.DS_Store')
 python3 - "$ROOT" <<'PY'
-import json, sys
+import json, sys, hashlib
 root = sys.argv[1]
+bp = json.load(open(f"{root}/blueprint.json"))
+# ใส่ ?v=<hash ของ zip> ให้ URL เปลี่ยนทุกครั้งที่ theme เปลี่ยน ไม่งั้นเบราว์เซอร์ใช้ zip เก่าจาก cache
+ver = hashlib.sha256(open(f"{root}/dist/my-memories.zip", "rb").read()).hexdigest()[:10]
+for s in bp["steps"]:
+    if s.get("step") == "installTheme":
+        s["themeData"]["url"] = s["themeData"]["url"].split("?")[0] + "?v=" + ver
+json.dump(bp, open(f"{root}/blueprint.json", "w"), indent=2, ensure_ascii=False)
 bp = json.load(open(f"{root}/blueprint.json"))
 for i, s in enumerate(bp["steps"]):
     if s.get("step") == "installTheme":
