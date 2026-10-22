@@ -113,6 +113,17 @@ function mm_dashboard_widget() {
 		. '</ul>';
 }
 
+// ไม่ให้ WooCommerce พาไปหน้า "Welcome… start selling" (ตั้งค่าร้านขายของ ซึ่งร้านไม่ได้ใช้)
+add_filter( 'woocommerce_prevent_automatic_wizard_redirect', '__return_true' );
+add_filter( 'woocommerce_enable_setup_wizard', '__return_false' );
+add_action( 'admin_init', function () {
+	delete_transient( '_wc_activation_redirect' );
+	if ( mm_is_shop_user() && 'wc-admin' === ( $_GET['page'] ?? '' ) ) {
+		wp_safe_redirect( admin_url() );
+		exit;
+	}
+}, 1 );
+
 /* ---------------------------------------------------------------- เมนูของบัญชีร้าน: เหลือแค่ที่ใช้ */
 
 add_action( 'admin_menu', function () {
