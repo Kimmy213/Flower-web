@@ -224,14 +224,29 @@ function mm_b_cover( $img, $eyebrow, $title, $text, $buttons = [], $min = 520 ) 
 }
 
 // block แกลเลอรีจริง ร้านลากรูปเข้า-ออกได้ในหน้าแก้ไข
-function mm_b_gallery( $ids ) {
+// $class: mm-gallery (ตาราง 3 คอลัมน์), mm-strip (แถวรูปแนวตั้งเลื่อนข้าง), mm-mosaic (โมเสกเต็มจอ)
+function mm_b_gallery( $ids, $class = 'mm-gallery', $note = true, $align = '' ) {
 	$imgs = '';
 	foreach ( $ids as $id ) {
 		$url   = wp_get_attachment_url( $id );
 		$imgs .= "<!-- wp:image {\"id\":$id,\"sizeSlug\":\"large\",\"linkDestination\":\"none\"} -->\n<figure class=\"wp-block-image size-large\"><img src=\"$url\" alt=\"\" class=\"wp-image-$id\"/></figure>\n<!-- /wp:image -->\n";
 	}
-	return "<!-- wp:gallery {\"columns\":3,\"linkTo\":\"none\",\"className\":\"mm-gallery\"} -->\n<figure class=\"wp-block-gallery has-nested-images columns-3 is-cropped mm-gallery\">$imgs</figure>\n<!-- /wp:gallery -->\n"
-		. mm_b_p( 'ภาพตัวอย่าง จะเปลี่ยนเป็นผลงานจริงของร้าน', 'mm-note' );
+	$a_attr = $align ? ",\"align\":\"$align\"" : '';
+	$a_cls  = $align ? " align$align" : '';
+	return "<!-- wp:gallery {\"columns\":3,\"linkTo\":\"none\"$a_attr,\"className\":\"$class\"} -->\n<figure class=\"wp-block-gallery$a_cls has-nested-images columns-3 is-cropped $class\">$imgs</figure>\n<!-- /wp:gallery -->\n"
+		. ( $note ? mm_b_p( 'ภาพตัวอย่าง จะเปลี่ยนเป็นผลงานจริงของร้าน', 'mm-note' ) : '' );
+}
+
+// หน้าผลงานแบบ ivyandpollen.com/events:
+// ① หัวข้อ + คำอธิบายซ้าย / แถวรูปแนวตั้งเลื่อนข้างขวา ② Our Projects โมเสกเต็มจอ ③ ฟอร์มส่งรายละเอียดงานทาง LINE
+function mm_b_portfolio( $title, $text, $strip, $mosaic, $form_type ) {
+	$intro = "<!-- wp:group {\"align\":\"full\",\"className\":\"mm-intro\",\"layout\":{\"type\":\"default\"}} -->\n<div class=\"wp-block-group alignfull mm-intro\">"
+		. "<!-- wp:group {\"className\":\"mm-intro-text\",\"layout\":{\"type\":\"default\"}} -->\n<div class=\"wp-block-group mm-intro-text\">" . mm_b_h( $title, 1 ) . mm_b_p( $text ) . "</div>\n<!-- /wp:group -->\n"
+		. mm_b_gallery( $strip, 'mm-strip', false )
+		. "</div>\n<!-- /wp:group -->\n";
+	$projects = mm_b_h( 'Our Projects' ) . mm_b_gallery( $mosaic, 'mm-mosaic', false, 'full' ) . mm_b_p( 'ภาพตัวอย่าง จะเปลี่ยนเป็นผลงานจริงของร้าน', 'mm-note' );
+	$contact  = mm_b_section( mm_b_h( 'Contact us' ) . mm_b_p( 'กรอกรายละเอียดงาน แล้วกดส่ง ระบบจะเปิดแชท LINE ของร้านพร้อมข้อความให้ทันที', 'mm-lead' ) . mm_b_sc( '[mm_event_form type="' . $form_type . '"]' ), 'mm-contact' );
+	return $intro . "<!-- wp:group {\"align\":\"full\",\"className\":\"mm-projects\",\"layout\":{\"type\":\"constrained\",\"contentSize\":\"1240px\"}} -->\n<div class=\"wp-block-group alignfull mm-projects\">" . $projects . "</div>\n<!-- /wp:group -->\n" . $contact;
 }
 
 /* ---------------------------------------------------------------- หน้า */
@@ -272,15 +287,22 @@ function mm_setup_pages( $img ) {
 		. mm_b_section( mm_b_intro( 'Services', 'เลือกประเภทงาน' ) . mm_b_sc( '[mm_subpages parent="event-and-party"]' ) )
 		. $cta( 'เล่างานของคุณให้เราฟัง', 'บอกวันที่ สถานที่ ธีมสี และงบประมาณ ร้านจะส่งไอเดียและใบเสนอราคากลับไป' ), 0, 1, $img['event'], 'งานอีเวนต์และปาร์ตี้' );
 
+	// ภาพที่ไม่ใช่ปก ใช้ทำโมเสกผลงาน
+	$works = array_values( array_filter( $img, fn( $k ) => ! str_starts_with( $k, 'customer' ) && 'hero' !== $k, ARRAY_FILTER_USE_KEY ) );
+
 	$pages['event'] = mm_page( 'event', 'Event',
-		mm_b_cover( $img['event'], 'Event', 'Event Flowers', 'งานเปิดตัวสินค้า งานสัมมนา งานแต่งงาน และพิธีการ จัดดอกไม้ทั้งงานตามคอนเซปต์' )
-		. mm_b_section( mm_b_intro( 'What we do', 'งานที่เรารับจัด', 'ซุ้มดอกไม้และฉากถ่ายรูป · ดอกไม้โต๊ะต้อนรับและโต๊ะจัดเลี้ยง · ดอกไม้ประดับเวที · ช่อมอบบนเวที · ดอกไม้ติดหน้าอก' ) . mm_b_gallery( [ $img['event'], $img['elegant-orchid-vase'], $img['pure-tribute-wreath'], $img['pearl-white-box'], $img['everlasting-vase'], $img['blush-peony-bouquet'] ] ) )
-		. $cta( 'วางแผนงานอีเวนต์', 'แนะนำให้ติดต่อล่วงหน้าอย่างน้อย 2 สัปดาห์สำหรับงานใหญ่' ), $pages['event-and-party'], 0, $img['event'], 'งานเปิดตัว งานแต่ง พิธีการ' );
+		mm_b_portfolio( 'Event<br>Decoration',
+			'งานเปิดตัวสินค้า งานสัมมนา งานแต่งงาน หรือพิธีการ เราออกแบบดอกไม้ให้เข้ากับธีม สี และงบประมาณของงาน ตั้งแต่ซุ้มต้อนรับ ฉากถ่ายรูป ดอกไม้บนเวที ไปจนถึงโต๊ะจัดเลี้ยง พร้อมทีมจัดหน้างานและเก็บงานหลังจบ',
+			[ $img['event'], $img['elegant-orchid-vase'], $img['pure-tribute-wreath'], $img['everlasting-vase'], $img['pearl-white-box'] ],
+			array_slice( $works, 0, 20 ), 'Event' ),
+		$pages['event-and-party'], 0, $img['event'], 'งานเปิดตัว งานแต่ง พิธีการ' );
 
 	$pages['party'] = mm_page( 'party', 'Party',
-		mm_b_cover( $img['party'], 'Party', 'Party Flowers', 'ปาร์ตี้วันเกิด เบบี้ชาวเวอร์ ดินเนอร์ส่วนตัว และงานฉลองเล็ก ๆ ที่อยากให้พิเศษ' )
-		. mm_b_section( mm_b_intro( 'Ideas', 'ไอเดียสำหรับปาร์ตี้', 'ดอกไม้กลางโต๊ะ · ช่อเล็กสำหรับแขก · กล่องดอกไม้เซอร์ไพรส์ · ตกแต่งมุมถ่ายรูป' ) . mm_b_gallery( [ $img['party'], $img['secret-garden-basket'], $img['rose-heart-box'], $img['silk-pastel-bouquet'], $img['sunny-days'], $img['fresh-fruit-basket'] ] ) )
-		. $cta( 'เตรียมปาร์ตี้ของคุณ', 'บอกจำนวนแขก ธีมสี และวันที่ แล้วร้านจะช่วยออกแบบให้' ), $pages['event-and-party'], 1, $img['party'], 'วันเกิด ดินเนอร์ งานฉลอง' );
+		mm_b_portfolio( 'Party<br>Flowers',
+			'วันเกิด ขอแต่งงาน เบบี้ชาวเวอร์ ปาร์ตี้สละโสด หรือดินเนอร์ส่วนตัว ให้เราเปลี่ยนพื้นที่ของคุณด้วยดอกไม้ในสไตล์ที่ชอบ ทั้งหวาน เรียบหรู หรือสนุกสดใส',
+			[ $img['party'], $img['secret-garden-basket'], $img['rose-heart-box'], $img['silk-pastel-bouquet'], $img['sunny-days'] ],
+			array_slice( array_reverse( $works ), 0, 20 ), 'Party' ),
+		$pages['event-and-party'], 1, $img['party'], 'วันเกิด ดินเนอร์ งานฉลอง' );
 
 	$pages['our-customers'] = mm_page( 'our-customers', 'Our Customers',
 		mm_b_cover( $img['customer-client'], 'Our Customers', 'ลูกค้าของเรา', 'ขอบคุณทุกความไว้วางใจ ทั้งลูกค้าทั่วไป เซเลบริตี้ องค์กร และแบรนด์' )

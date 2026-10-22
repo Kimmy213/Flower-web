@@ -224,3 +224,56 @@ img { max-width: 100%; height: auto; }
 @media (max-width: 781px) {
   .mm-hero .wp-block-cover__background { background: linear-gradient(180deg, rgb(251 248 244 / .85) 0%, rgb(251 248 244 / .55) 100%) !important; }
 }
+
+/* ---------- หน้าผลงาน Event / Party (โครงตาม ivyandpollen.com/events) ---------- */
+.mm-intro {
+  display: grid; grid-template-columns: minmax(240px, 300px) 1fr; gap: clamp(24px, 4vw, 56px); align-items: start;
+  padding: clamp(48px, 7vw, 96px) 0 clamp(48px, 7vw, 96px) max(16px, calc((100vw - 1240px) / 2)) !important;
+  margin-top: 0 !important; overflow: hidden;
+}
+.mm-intro-text h1 { font-size: clamp(2.2rem, 4vw, 3.2rem); font-weight: 500; color: var(--mm-rose-dark); margin: 0 0 1rem; }
+.mm-intro-text p { color: var(--mm-muted); font-size: .98rem; }
+
+/* แถวรูปแนวตั้ง เลื่อนข้างได้ ล้นขอบขวาจอ */
+.mm-strip.wp-block-gallery {
+  display: flex !important; flex-wrap: nowrap !important; gap: 18px !important; margin: 0 !important;
+  overflow-x: auto; scroll-snap-type: x mandatory; padding-right: 16px; scrollbar-width: thin;
+}
+.mm-strip.wp-block-gallery .wp-block-image {
+  flex: 0 0 clamp(220px, 24vw, 340px) !important; width: auto !important; margin: 0 !important; scroll-snap-align: start;
+}
+.mm-strip.wp-block-gallery .wp-block-image img { aspect-ratio: 3 / 4; object-fit: cover; border-radius: 14px; height: auto !important; }
+
+/* Our Projects: โมเสกเต็มจอ ช่องไฟบาง รูปใหญ่สลับเล็ก */
+.mm-projects { padding-top: clamp(32px, 5vw, 64px); padding-bottom: 24px; }
+.mm-projects > h2 { text-align: center; color: var(--mm-rose-dark); font-weight: 500; margin-bottom: 2rem; }
+.mm-mosaic.wp-block-gallery {
+  display: grid !important; grid-template-columns: repeat(4, 1fr); grid-auto-flow: dense; gap: 4px !important;
+  margin-left: calc(50% - 50vw) !important; margin-right: calc(50% - 50vw) !important; max-width: 100vw !important; width: 100vw;
+}
+.mm-mosaic.wp-block-gallery .wp-block-image { width: auto !important; margin: 0 !important; aspect-ratio: 1; }
+.mm-mosaic.wp-block-gallery .wp-block-image:nth-child(10n+1),
+.mm-mosaic.wp-block-gallery .wp-block-image:nth-child(10n+7) { grid-column: span 2; grid-row: span 2; aspect-ratio: auto; }
+.mm-mosaic.wp-block-gallery .wp-block-image img { width: 100% !important; height: 100% !important; object-fit: cover; transition: transform .6s ease; }
+.mm-mosaic.wp-block-gallery .wp-block-image { overflow: hidden; }
+.mm-mosaic.wp-block-gallery .wp-block-image:hover img { transform: scale(1.03); }
+
+/* ฟอร์มส่งรายละเอียดงานทาง LINE */
+.mm-contact > h2 { margin-bottom: .4rem; }
+.mm-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; max-width: 900px; margin: 1.6rem auto 0; }
+.mm-form label { display: grid; gap: 6px; font-size: .9rem; color: var(--mm-muted); }
+.mm-form label.wide { grid-column: 1 / -1; }
+.mm-form input, .mm-form textarea {
+  font: inherit; font-size: 1rem; color: var(--mm-ink); background: #fff;
+  border: 1px solid var(--mm-line); border-radius: var(--mm-radius); padding: 10px 12px;
+}
+.mm-form input:focus, .mm-form textarea:focus { outline: 2px solid var(--mm-rose); outline-offset: 1px; border-color: transparent; }
+.mm-form .mm-btn { grid-column: 1 / -1; justify-self: start; cursor: pointer; font: inherit; font-weight: 500; }
+
+@media (max-width: 781px) {
+  .mm-intro { grid-template-columns: 1fr; padding-left: 16px !important; }
+  .mm-intro-text { padding-right: 16px; }
+  .mm-strip.wp-block-gallery .wp-block-image { flex-basis: 62vw !important; }
+  .mm-mosaic.wp-block-gallery { grid-template-columns: repeat(2, 1fr); }
+  .mm-form { grid-template-columns: 1fr; }
+}

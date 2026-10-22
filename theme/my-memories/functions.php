@@ -277,3 +277,43 @@ add_shortcode( 'mm_footer', function () {
 		. $map
 		. '</div><p class="mm-copy">© ' . gmdate( 'Y' ) . ' ' . esc_html( $s['name'] . ' ' . $s['sub'] ) . '</p></footer>';
 } );
+
+// [mm_event_form type="Event"] ฟอร์มรายละเอียดงาน กดส่งแล้วเปิดแชท LINE ของร้านพร้อมข้อความ (ไม่ต้องมีอีเมลหรือ server)
+add_shortcode( 'mm_event_form', function ( $atts ) {
+	$type = shortcode_atts( [ 'type' => 'Event' ], $atts )['type'];
+	$id   = mm_shop()['line'];
+	if ( ! $id ) return '';
+	$fields = [
+		[ 'name', 'ชื่อ', 'text', true ],
+		[ 'phone', 'เบอร์โทร', 'tel', true ],
+		[ 'date', 'วันที่จัดงาน', 'date', false ],
+		[ 'place', 'สถานที่', 'text', false ],
+		[ 'budget', 'งบประมาณ (บาท)', 'text', false ],
+		[ 'theme', 'ธีม / โทนสี', 'text', false ],
+	];
+	$html = '';
+	foreach ( $fields as [ $key, $label, $input, $req ] ) {
+		$html .= sprintf( '<label><span>%s%s</span><input type="%s" name="%s"%s></label>', esc_html( $label ), $req ? ' *' : '', $input, $key, $req ? ' required' : '' );
+	}
+	$html .= '<label class="wide"><span>รายละเอียดงาน *</span><textarea name="detail" rows="4" required placeholder="เช่น จำนวนแขก, จุดที่อยากให้จัดดอกไม้, ไอเดียที่ชอบ"></textarea></label>';
+	return sprintf(
+		'<form class="mm-form" data-line="%s" data-type="%s">%s<button type="submit" class="mm-btn">ส่งรายละเอียดทาง LINE</button></form>',
+		esc_attr( $id ), esc_attr( $type ), $html
+	);
+} );
+
+add_action( 'wp_footer', function () {
+	?>
+	<script>
+	document.querySelectorAll('.mm-form').forEach(function (form) {
+		form.addEventListener('submit', function (e) {
+			e.preventDefault();
+			var labels = { name: 'ชื่อ', phone: 'เบอร์โทร', date: 'วันที่จัดงาน', place: 'สถานที่', budget: 'งบประมาณ', theme: 'ธีม/โทนสี', detail: 'รายละเอียด' };
+			var lines = ['สอบถามจัดดอกไม้งาน ' + form.dataset.type];
+			new FormData(form).forEach(function (v, k) { if (String(v).trim()) lines.push(labels[k] + ': ' + String(v).trim()); });
+			window.open('https://line.me/R/oaMessage/' + encodeURIComponent(form.dataset.line) + '/?' + encodeURIComponent(lines.join('\n')), '_blank', 'noopener');
+		});
+	});
+	</script>
+	<?php
+} );
