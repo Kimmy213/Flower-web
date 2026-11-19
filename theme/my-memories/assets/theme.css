@@ -317,20 +317,29 @@ img { max-width: 100%; height: auto; }
   display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; user-select: none;
 }
 .mm-slider::-webkit-scrollbar { display: none; }
+/* รูปเต็มจอเป็นพื้นหลัง ข้อความทับด้านซ้าย พร้อมไล่สีจาง (แบบภาพปกเดิม) */
 .mm-slide {
-  flex: 0 0 100%; scroll-snap-align: start; display: grid; grid-template-columns: 1fr 1fr; align-items: center;
-  min-height: clamp(460px, 62vh, 640px); background: var(--mm-blush);
+  flex: 0 0 100%; scroll-snap-align: start; position: relative; display: flex; align-items: center;
+  min-height: clamp(480px, 70vh, 680px); background: var(--mm-blush); overflow: hidden;
 }
-.mm-slide-text { padding: clamp(32px, 6vw, 80px) clamp(20px, 4vw, 56px) clamp(32px, 6vw, 80px) max(20px, calc((100vw - 1240px) / 2)); }
+.mm-slide-media { position: absolute; inset: 0; }
+.mm-slide-media img { width: 100%; height: 100%; object-fit: cover; object-position: right center; pointer-events: none; }
+.mm-slide-media::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgb(251 248 244 / .94) 0%, rgb(251 248 244 / .7) 42%, rgb(251 248 244 / 0) 72%);
+}
+.mm-slide-text {
+  position: relative; z-index: 1; width: 100%; max-width: 1240px; margin: 0 auto;
+  padding: clamp(48px, 8vw, 120px) clamp(16px, 4vw, 48px);
+}
+.mm-slide-text > * { max-width: 560px; }
 .mm-slide-title { font-size: clamp(2.4rem, 5vw, 4rem); margin: .2em 0 .3em; color: var(--mm-ink); }
-.mm-slide-text .mm-lead { color: #5b4b4b; max-width: 30em; }
+.mm-slide-text .mm-lead { color: #5b4b4b; }
 .mm-slide-btn {
   display: inline-block; margin-top: 1.2rem; text-decoration: none; border-radius: 999px; padding: .85rem 2rem;
   background: var(--mm-rose); color: #fff !important; font-weight: 500; letter-spacing: .04em;
 }
 .mm-slide-btn:hover { background: var(--mm-rose-dark); }
-.mm-slide-media { align-self: stretch; overflow: hidden; }
-.mm-slide-media img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
 .mm-strip-wrap.is-slider .mm-strip-btn.prev { left: 16px; }
 .mm-strip-wrap.is-slider .mm-strip-btn.next { right: 16px; }
 .mm-strip-wrap.single .mm-strip-btn { display: none; }
@@ -350,12 +359,14 @@ img { max-width: 100%; height: auto; }
 .mm-closing .wp-block-buttons { justify-content: center; }
 
 @media (max-width: 781px) {
-  .mm-slide { grid-template-columns: 1fr; min-height: 0; }
-  .mm-slide-media { order: -1; height: 280px; }
-  .mm-slide-text { padding: 28px 20px 56px; }
+  .mm-slide { min-height: 520px; }
+  .mm-slide-media img { object-position: 70% center; }
+  .mm-slide-media::after { background: linear-gradient(180deg, rgb(251 248 244 / .85) 0%, rgb(251 248 244 / .55) 100%); }
+  .mm-slide-text { padding: 48px 20px 64px; }
   .mm-dots { bottom: 14px; }
 }
 .mm-intro-text p.mm-tagline { font-size: 1.25rem; color: var(--mm-rose-dark); margin: -.4rem 0 1rem; }
+/* มือถือ: สไลด์ปัดนิ้ว + จุดบอกตำแหน่ง ไม่ใช้ปุ่ม ‹ › เพราะทับข้อความ */
 @media (max-width: 781px) {
-  .mm-strip-wrap.is-slider .mm-strip-btn { top: 140px; }
+  .mm-strip-wrap.is-slider .mm-strip-btn { display: none; }
 }

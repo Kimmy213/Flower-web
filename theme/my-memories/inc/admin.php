@@ -80,12 +80,12 @@ function mm_shop_page() {
 // หมวดที่ติ๊กจะขึ้นสไลด์บนสุดของหน้าแรก ([mm_featured_collections] ใน functions.php)
 add_action( 'product_cat_add_form_fields', function () {
 	echo '<div class="form-field"><input type="hidden" name="mm_home_present" value="1"><label><input type="checkbox" name="mm_home" value="1"> <strong>แสดงบนหน้าแรก</strong></label>'
-		. '<p>ติ๊กเพื่อโชว์คอลเลกชันนี้เป็นสไลด์บนสุดของหน้าแรก (เช่น คอลเลกชันตามเทศกาล) รูปสไลด์ = ภาพย่อด้านล่าง ข้อความ = คำอธิบาย</p></div>';
+		. '<p>ติ๊กเพื่อโชว์คอลเลกชันนี้เป็นสไลด์บนสุดของหน้าแรก (เช่น คอลเลกชันตามเทศกาล) รูปสไลด์ = ภาพย่อด้านล่าง (ใช้<strong>รูปแนวนอน</strong> เช่น 1600×900 รูปจะเต็มจอ) ข้อความ = คำอธิบาย</p></div>';
 }, 5 );
 
 add_action( 'product_cat_edit_form_fields', function ( $term ) {
 	printf(
-		'<tr class="form-field"><th scope="row">แสดงบนหน้าแรก</th><td><input type="hidden" name="mm_home_present" value="1"><label><input type="checkbox" name="mm_home" value="1" %s> โชว์คอลเลกชันนี้เป็นสไลด์บนสุดของหน้าแรก</label><p class="description">รูปสไลด์ = ภาพย่อ (Thumbnail) ของหมวด ข้อความ = คำอธิบาย หมดเทศกาลก็เอาติ๊กออก</p></td></tr>',
+		'<tr class="form-field"><th scope="row">แสดงบนหน้าแรก</th><td><input type="hidden" name="mm_home_present" value="1"><label><input type="checkbox" name="mm_home" value="1" %s> โชว์คอลเลกชันนี้เป็นสไลด์บนสุดของหน้าแรก</label><p class="description">รูปสไลด์ = ภาพย่อ (Thumbnail) ของหมวด ใช้<strong>รูปแนวนอน</strong> เช่น 1600×900 เพราะรูปจะเต็มจอ ข้อความ = คำอธิบาย หมดเทศกาลก็เอาติ๊กออก</p></td></tr>',
 		checked( get_term_meta( $term->term_id, 'mm_home', true ), '1', false )
 	);
 }, 5 );
@@ -138,7 +138,7 @@ function mm_dashboard_widget() {
 		. '<li><strong>ซ่อนสินค้าชั่วคราว:</strong> เปิดสินค้า แล้วเปลี่ยนสถานะเป็น "ฉบับร่าง" (Draft)</li>'
 		. '<li><strong>แก้ราคาเร็ว ๆ:</strong> ในหน้าสินค้าทั้งหมด ชี้เมาส์ที่สินค้า แล้วกด "แก้ไขด่วน"</li>'
 		. '<li><strong>เพิ่มหมวดใหม่:</strong> หมวดจะขึ้นเมนูด้านบนเอง ถ้าเป็นหมวดย่อย ให้เลือก "หมวดหมู่หลัก" ตอนสร้าง</li>'
-		. '<li><strong>คอลเลกชันใหม่/ตามเทศกาลขึ้นสไลด์บนสุดของหน้าแรก:</strong> หมวดสินค้า → แก้ไขหมวด (หรือสร้างหมวดใหม่ใต้ Occasion) → ติ๊ก <strong>แสดงบนหน้าแรก</strong> รูปสไลด์ = ภาพย่อของหมวด ข้อความ = คำอธิบายหมวด หมดเทศกาลก็เอาติ๊กออก</li>'
+		. '<li><strong>คอลเลกชันใหม่/ตามเทศกาลขึ้นสไลด์บนสุดของหน้าแรก:</strong> หมวดสินค้า → แก้ไขหมวด (หรือสร้างหมวดใหม่ใต้ Occasion) → ติ๊ก <strong>แสดงบนหน้าแรก</strong> รูปสไลด์ = ภาพย่อของหมวด (ใช้รูปแนวนอน) ข้อความ = คำอธิบายหมวด หมดเทศกาลก็เอาติ๊กออก</li>'
 		. '<li><strong>รูปการ์ดของหมวดหน้าแรก:</strong> แก้ที่ หมวดสินค้า → เลือกหมวด → ภาพย่อ (Thumbnail)</li>'
 		. '</ul>';
 }

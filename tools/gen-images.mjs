@@ -114,6 +114,9 @@ const scene = (name, w, h, groups, bg, label) => {
 };
 const ROSE = ["#f2b8c6", "#e795aa", "#fff3e6", "#d97a92"];
 scene("hero", 1600, 900, [["vase", 150, 58, 0.75, ["#e9c6b8", "#f2b8c6", "#fff3e6"]], ["bouquet", 212, 12, 0.98, ROSE], ["box", 290, 96, 0.58, ["#ffffff", "#f2b8c6", "#e795aa"]]], "#f3e4e1");
+// แบนเนอร์แนวนอนของคอลเลกชันที่ขึ้นสไลด์หน้าแรก (ของจัดอยู่ครึ่งขวา ซ้ายเว้นที่ให้ข้อความ)
+scene("banner-christmas", 1600, 900, [["bouquet", 160, 40, 0.8, ["#c63d5d", "#ffffff", "#d9a441"]], ["wreath", 220, 6, 0.95, ["#b3122f", "#d9a441", "#ffffff"]], ["box", 300, 100, 0.55, ["#b3122f", "#e07c93", "#fff3e6"]]], "#f3e6e1");
+scene("banner-new-year", 1600, 900, [["vase", 170, 30, 0.9, ["#a066b8", "#c9a3d8", "#ffffff"]], ["fruit", 270, 70, 0.72, ["#f28c28", "#d7263d", "#7b2d8b", "#9bc53d"]]], "#efe7f1");
 scene("event", 1600, 1000, [["wreath", 100, 12, 1.0, ["#ffffff", "#f2b8c6", "#e9c6b8"]], ["vase", 10, 80, 0.8, ROSE], ["vase", 230, 80, 0.8, ROSE]], "#efe6dc");
 scene("party", 1600, 1000, [["basket", 10, 70, 0.8, ["#f4a259", "#f7d488", "#e8778d"]], ["box", 140, 75, 0.8, ["#fff3e6", "#e795aa", "#c63d5d"]], ["bouquet", 260, 60, 0.85, ["#d7c3ec", "#f6d5df", "#fff1c7"]]], "#f1e7ef");
 for (const [name, bg, kind, colors] of [

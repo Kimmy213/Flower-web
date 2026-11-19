@@ -174,8 +174,8 @@ function mm_setup_category_images( $cats, $img ) {
 	}
 	// คอลเลกชันตามเทศกาลที่ติ๊ก "แสดงบนหน้าแรก" ไว้เป็นตัวอย่าง (ร้านติ๊กเองได้ที่ หมวดสินค้า → แก้ไข)
 	foreach ( [
-		'christmas' => [ 'christmas-door-wreath', 'Christmas Collection 2026 — พวงหรีด ช่อดอกไม้ และกล่องของขวัญโทนแดง-ทอง สำหรับเทศกาลแห่งความสุข' ],
-		'new-year'  => [ 'elegant-orchid-vase', 'New Year Collection — แจกันกล้วยไม้และกระเช้าของขวัญ ส่งความปรารถนาดีรับปีใหม่' ],
+		'christmas' => [ 'banner-christmas', 'Christmas Collection 2026 — พวงหรีด ช่อดอกไม้ และกล่องของขวัญโทนแดง-ทอง สำหรับเทศกาลแห่งความสุข' ],
+		'new-year'  => [ 'banner-new-year', 'New Year Collection — แจกันกล้วยไม้และกระเช้าของขวัญ ส่งความปรารถนาดีรับปีใหม่' ],
 	] as $cat => [ $image, $desc ] ) {
 		update_term_meta( $cats[ $cat ], 'thumbnail_id', $img[ $image ] );
 		update_term_meta( $cats[ $cat ], 'mm_home', 1 );
@@ -300,7 +300,7 @@ function mm_setup_pages( $img ) {
 		. $cta( 'เล่างานของคุณให้เราฟัง', 'บอกวันที่ สถานที่ ธีมสี และงบประมาณ ร้านจะส่งไอเดียและใบเสนอราคากลับไป' ), 0, 1, $img['event'], 'งานอีเวนต์และปาร์ตี้' );
 
 	// ภาพที่ไม่ใช่ปก ใช้ทำโมเสกผลงาน
-	$works = array_values( array_filter( $img, fn( $k ) => ! str_starts_with( $k, 'customer' ) && 'hero' !== $k, ARRAY_FILTER_USE_KEY ) );
+	$works = array_values( array_filter( $img, fn( $k ) => ! str_starts_with( $k, 'customer' ) && ! str_starts_with( $k, 'banner-' ) && 'hero' !== $k, ARRAY_FILTER_USE_KEY ) );
 
 	$pages['event'] = mm_page( 'event', 'Event',
 		mm_b_portfolio( 'Event<br>Decoration',
@@ -330,7 +330,7 @@ function mm_setup_pages( $img ) {
 	foreach ( $groups as $slug => [ $title, $th, $text, $cover ] ) {
 		$pages[ $slug ] = mm_page( $slug, $title,
 			mm_b_cover( $img[ $cover ], 'Our Customers', $title, $text )
-			. mm_b_section( mm_b_intro( 'Gallery', 'ผลงาน · ' . $th ) . mm_b_gallery( array_slice( array_values( array_filter( $img, fn( $k ) => ! str_starts_with( $k, 'customer' ) && ! in_array( $k, [ 'hero', 'event', 'party' ], true ), ARRAY_FILTER_USE_KEY ) ), $order * 3, 6 ) ) )
+			. mm_b_section( mm_b_intro( 'Gallery', 'ผลงาน · ' . $th ) . mm_b_gallery( array_slice( array_values( array_filter( $img, fn( $k ) => ! str_starts_with( $k, 'customer' ) && ! str_starts_with( $k, 'banner-' ) && ! in_array( $k, [ 'hero', 'event', 'party' ], true ), ARRAY_FILTER_USE_KEY ) ), $order * 3, 6 ) ) )
 			. $cta( 'อยากให้เราดูแลดอกไม้ของคุณ', 'ทักมาคุยรายละเอียดได้ทุกวัน' ), $pages['our-customers'], $order++, $img[ $cover ], $th );
 	}
 
