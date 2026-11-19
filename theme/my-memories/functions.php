@@ -12,8 +12,8 @@ require_once __DIR__ . '/inc/admin.php';
 // ค่าเริ่มต้น ร้านแก้ทับได้ที่หลังบ้าน (option: mm_shop) ช่องว่าง = ไม่แสดงบนเว็บ
 function mm_shop() {
 	$defaults = [
-		'name'      => 'My Memories',
-		'sub'       => 'Flower Shop',
+		'name'      => 'My.Memories',
+		'sub'       => 'Flower Studio',
 		'tagline'   => 'Romantic · Classy · Modern',
 		'address'   => 'Sukhumvit 101/1, Bangkok',
 		'hours'     => 'เปิดทุกวัน 08:00–18:00',
@@ -199,9 +199,30 @@ add_shortcode( 'mm_collections', function () {
 		$html .= mm_card( get_term_link( $cat ), (int) get_term_meta( $cat->term_id, 'thumbnail_id', true ), $cat->name, $sub );
 	}
 	foreach ( mm_menu_pages() as $page ) {
-		if ( 'event-and-party' === $page->post_name ) $html .= mm_card( get_permalink( $page ), get_post_thumbnail_id( $page ), $page->post_title, $page->post_excerpt );
+		if ( in_array( $page->post_name, [ 'event-and-party', 'corporate-services' ], true ) ) $html .= mm_card( get_permalink( $page ), get_post_thumbnail_id( $page ), $page->post_title, $page->post_excerpt );
 	}
 	return '<div class="mm-cards mm-cards-collections">' . $html . '</div>';
+} );
+
+// [mm_featured_collections] สไลด์บนสุดของหน้าแรก = หมวดที่ร้านติ๊ก "แสดงบนหน้าแรก" (inc/admin.php)
+// รูป = ภาพย่อของหมวด, ข้อความ = คำอธิบายหมวด, ปุ่ม = ไปหน้าคอลเลกชันนั้น ถ้าไม่มีหมวดไหนติ๊ก จะแสดงสไลด์แนะนำร้านแทน
+add_shortcode( 'mm_featured_collections', function () {
+	$terms  = get_terms( [ 'taxonomy' => 'product_cat', 'hide_empty' => false, 'meta_key' => 'mm_home', 'meta_value' => '1' ] );
+	$slide  = fn( $eyebrow, $title, $text, $url, $btn, $img ) => sprintf(
+		'<div class="mm-slide"><div class="mm-slide-text"><p class="mm-eyebrow">%s</p><h2 class="mm-slide-title">%s</h2><p class="mm-lead">%s</p><a class="mm-slide-btn wp-element-button" href="%s">%s</a></div><div class="mm-slide-media">%s</div></div>',
+		esc_html( $eyebrow ), esc_html( $title ), esc_html( $text ), esc_url( $url ), esc_html( $btn ), $img ? wp_get_attachment_image( $img, 'full', false, [ 'loading' => 'eager' ] ) : ''
+	);
+	$slides = '';
+	foreach ( is_wp_error( $terms ) ? [] : $terms as $t ) {
+		$parent  = $t->parent ? get_term( $t->parent, 'product_cat' ) : null;
+		$eyebrow = $parent && 'occasion' === $parent->slug ? 'Seasonal Collection' : 'New Collection';
+		$slides .= $slide( $eyebrow, $t->name, wp_strip_all_tags( $t->description ), get_term_link( $t ), 'ดูคอลเลกชัน', (int) get_term_meta( $t->term_id, 'thumbnail_id', true ) );
+	}
+	if ( ! $slides ) {
+		$s       = mm_shop();
+		$slides  = $slide( $s['name'] . ' ' . $s['sub'], 'ดอกไม้สำหรับทุกความทรงจำ', $s['tagline'], get_permalink( wc_get_page_id( 'shop' ) ), 'ดูคอลเลกชันทั้งหมด', (int) get_option( 'mm_fallback_hero' ) );
+	}
+	return '<section class="mm-featured" aria-label="คอลเลกชันแนะนำ"><div class="mm-slider">' . $slides . '</div></section>';
 } );
 
 // [mm_subpages parent="our-customers"] การ์ดของหน้าย่อย (รูป = รูปเด่นของหน้า, คำอธิบาย = ข้อความสรุป/excerpt)
@@ -287,6 +308,8 @@ add_shortcode( 'mm_event_form', function ( $atts ) {
 	$fields = [
 		[ 'name', 'ชื่อ', 'text', true ],
 		[ 'phone', 'เบอร์โทร', 'tel', true ],
+		[ 'company', 'บริษัท / แบรนด์ (ถ้ามี)', 'text', false ],
+		[ 'qty', 'จำนวน (ชิ้น / คน)', 'text', false ],
 		[ 'date', 'วันที่จัดงาน', 'date', false ],
 		[ 'place', 'สถานที่', 'text', false ],
 		[ 'budget', 'งบประมาณ (บาท)', 'text', false ],
@@ -306,16 +329,33 @@ add_shortcode( 'mm_event_form', function ( $atts ) {
 add_action( 'wp_footer', function () {
 	?>
 	<script>
-	// แถวรูปเลื่อนข้าง: ปุ่ม ‹ › และกดเมาส์ค้างลากได้ (บนมือถือปัดนิ้วได้อยู่แล้ว)
-	document.querySelectorAll('.mm-strip').forEach(function (strip) {
+	// แถวรูป (.mm-strip) และสไลด์หน้าแรก (.mm-slider) เลื่อนข้าง: ปุ่ม ‹ › และกดเมาส์ค้างลากได้ (มือถือปัดนิ้วได้อยู่แล้ว)
+	document.querySelectorAll('.mm-strip, .mm-slider').forEach(function (strip) {
+		var isSlider = strip.classList.contains('mm-slider');
 		var wrap = document.createElement('div');
-		wrap.className = 'mm-strip-wrap';
+		wrap.className = 'mm-strip-wrap' + (isSlider ? ' is-slider' : '');
 		strip.parentNode.insertBefore(wrap, strip);
 		wrap.appendChild(strip);
+		var items = Array.prototype.slice.call(strip.children);
+		if (items.length < 2) wrap.classList.add('single');
 		var step = function () {
-			var item = strip.querySelector('.wp-block-image');
-			return item ? item.getBoundingClientRect().width + 18 : strip.clientWidth * 0.8;
+			var gap = parseFloat(getComputedStyle(strip).columnGap) || 0;
+			return items[0] ? items[0].getBoundingClientRect().width + gap : strip.clientWidth * 0.8;
 		};
+		var dots = [];
+		if (isSlider && items.length > 1) {
+			var nav = document.createElement('div');
+			nav.className = 'mm-dots';
+			items.forEach(function (_, i) {
+				var d = document.createElement('button');
+				d.type = 'button';
+				d.setAttribute('aria-label', 'สไลด์ที่ ' + (i + 1));
+				d.addEventListener('click', function () { strip.scrollLeft = i * step(); });
+				nav.appendChild(d);
+				dots.push(d);
+			});
+			wrap.appendChild(nav);
+		}
 		[['prev', '‹', 'รูปก่อนหน้า', -1], ['next', '›', 'รูปถัดไป', 1]].forEach(function (b) {
 			var btn = document.createElement('button');
 			btn.type = 'button';
@@ -334,6 +374,8 @@ add_action( 'wp_footer', function () {
 			var max = strip.scrollWidth - strip.clientWidth - 2;
 			wrap.classList.toggle('at-start', strip.scrollLeft <= 2);
 			wrap.classList.toggle('at-end', strip.scrollLeft >= max);
+			var cur = Math.round(strip.scrollLeft / (step() || 1));
+			dots.forEach(function (d, i) { d.classList.toggle('is-on', i === cur); });
 		};
 		strip.addEventListener('scroll', update, { passive: true });
 		window.addEventListener('resize', update);
@@ -363,8 +405,8 @@ add_action( 'wp_footer', function () {
 	document.querySelectorAll('.mm-form').forEach(function (form) {
 		form.addEventListener('submit', function (e) {
 			e.preventDefault();
-			var labels = { name: 'ชื่อ', phone: 'เบอร์โทร', date: 'วันที่จัดงาน', place: 'สถานที่', budget: 'งบประมาณ', theme: 'ธีม/โทนสี', detail: 'รายละเอียด' };
-			var lines = ['สอบถามจัดดอกไม้งาน ' + form.dataset.type];
+			var labels = { name: 'ชื่อ', phone: 'เบอร์โทร', company: 'บริษัท/แบรนด์', qty: 'จำนวน', date: 'วันที่จัดงาน', place: 'สถานที่', budget: 'งบประมาณ', theme: 'ธีม/โทนสี', detail: 'รายละเอียด' };
+			var lines = ['สอบถาม ' + form.dataset.type];
 			new FormData(form).forEach(function (v, k) { if (String(v).trim()) lines.push(labels[k] + ': ' + String(v).trim()); });
 			window.open('https://line.me/R/oaMessage/' + encodeURIComponent(form.dataset.line) + '/?' + encodeURIComponent(lines.join('\n')), '_blank', 'noopener');
 		});

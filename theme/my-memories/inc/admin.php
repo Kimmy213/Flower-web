@@ -12,7 +12,7 @@ function mm_shop_fields() {
 	return [
 		'ข้อมูลร้าน' => [
 			'name'      => [ 'ชื่อร้าน', 'แสดงเป็นโลโก้มุมซ้ายบน' ],
-			'sub'       => [ 'บรรทัดใต้ชื่อร้าน', 'เช่น Flower Shop' ],
+			'sub'       => [ 'บรรทัดใต้ชื่อร้าน', 'เช่น Flower Studio' ],
 			'tagline'   => [ 'คำโปรย', 'แสดงใน footer' ],
 			'address'   => [ 'ที่อยู่', '' ],
 			'hours'     => [ 'เวลาเปิด', 'เช่น เปิดทุกวัน 08:00–18:00' ],
@@ -75,6 +75,35 @@ function mm_shop_page() {
 	echo '</form></div>';
 }
 
+/* ---------------------------------------------------------------- หมวดสินค้า: ติ๊ก "แสดงบนหน้าแรก" */
+
+// หมวดที่ติ๊กจะขึ้นสไลด์บนสุดของหน้าแรก ([mm_featured_collections] ใน functions.php)
+add_action( 'product_cat_add_form_fields', function () {
+	echo '<div class="form-field"><input type="hidden" name="mm_home_present" value="1"><label><input type="checkbox" name="mm_home" value="1"> <strong>แสดงบนหน้าแรก</strong></label>'
+		. '<p>ติ๊กเพื่อโชว์คอลเลกชันนี้เป็นสไลด์บนสุดของหน้าแรก (เช่น คอลเลกชันตามเทศกาล) รูปสไลด์ = ภาพย่อด้านล่าง ข้อความ = คำอธิบาย</p></div>';
+}, 5 );
+
+add_action( 'product_cat_edit_form_fields', function ( $term ) {
+	printf(
+		'<tr class="form-field"><th scope="row">แสดงบนหน้าแรก</th><td><input type="hidden" name="mm_home_present" value="1"><label><input type="checkbox" name="mm_home" value="1" %s> โชว์คอลเลกชันนี้เป็นสไลด์บนสุดของหน้าแรก</label><p class="description">รูปสไลด์ = ภาพย่อ (Thumbnail) ของหมวด ข้อความ = คำอธิบาย หมดเทศกาลก็เอาติ๊กออก</p></td></tr>',
+		checked( get_term_meta( $term->term_id, 'mm_home', true ), '1', false )
+	);
+}, 5 );
+
+// บันทึกเฉพาะตอนส่งจากฟอร์มที่มีช่องนี้ (กันแก้ไขด่วนในรายการหมวดลบค่าทิ้ง)
+$mm_save_home = function ( $term_id ) {
+	if ( empty( $_POST['mm_home_present'] ) || ! current_user_can( 'manage_product_terms' ) ) return;
+	if ( empty( $_POST['mm_home'] ) ) delete_term_meta( $term_id, 'mm_home' );
+	else update_term_meta( $term_id, 'mm_home', 1 );
+};
+add_action( 'created_product_cat', $mm_save_home );
+add_action( 'edited_product_cat', $mm_save_home );
+
+add_filter( 'manage_edit-product_cat_columns', fn( $cols ) => array_slice( $cols, 0, 2, true ) + [ 'mm_home' => 'หน้าแรก' ] + array_slice( $cols, 2, null, true ) );
+add_filter( 'manage_product_cat_custom_column', function ( $out, $col, $term_id ) {
+	return 'mm_home' === $col ? ( get_term_meta( $term_id, 'mm_home', true ) ? '<span title="แสดงบนหน้าแรก" style="color:#b76e79;font-size:18px">★</span>' : '' ) : $out;
+}, 10, 3 );
+
 /* ---------------------------------------------------------------- หน้าแรกของหลังบ้าน: ปุ่มลัด */
 
 function mm_is_shop_user() {
@@ -87,7 +116,7 @@ add_action( 'wp_dashboard_setup', function () {
 		$wp_meta_boxes['dashboard'] = [];
 		remove_action( 'welcome_panel', 'wp_welcome_panel' );
 	}
-	wp_add_dashboard_widget( 'mm_start', 'จัดการร้าน My Memories', 'mm_dashboard_widget' );
+	wp_add_dashboard_widget( 'mm_start', 'จัดการร้าน ' . mm_shop()['name'], 'mm_dashboard_widget' );
 }, 99 );
 
 function mm_dashboard_widget() {
@@ -109,6 +138,7 @@ function mm_dashboard_widget() {
 		. '<li><strong>ซ่อนสินค้าชั่วคราว:</strong> เปิดสินค้า แล้วเปลี่ยนสถานะเป็น "ฉบับร่าง" (Draft)</li>'
 		. '<li><strong>แก้ราคาเร็ว ๆ:</strong> ในหน้าสินค้าทั้งหมด ชี้เมาส์ที่สินค้า แล้วกด "แก้ไขด่วน"</li>'
 		. '<li><strong>เพิ่มหมวดใหม่:</strong> หมวดจะขึ้นเมนูด้านบนเอง ถ้าเป็นหมวดย่อย ให้เลือก "หมวดหมู่หลัก" ตอนสร้าง</li>'
+		. '<li><strong>คอลเลกชันใหม่/ตามเทศกาลขึ้นสไลด์บนสุดของหน้าแรก:</strong> หมวดสินค้า → แก้ไขหมวด (หรือสร้างหมวดใหม่ใต้ Occasion) → ติ๊ก <strong>แสดงบนหน้าแรก</strong> รูปสไลด์ = ภาพย่อของหมวด ข้อความ = คำอธิบายหมวด หมดเทศกาลก็เอาติ๊กออก</li>'
 		. '<li><strong>รูปการ์ดของหมวดหน้าแรก:</strong> แก้ที่ หมวดสินค้า → เลือกหมวด → ภาพย่อ (Thumbnail)</li>'
 		. '</ul>';
 }

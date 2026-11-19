@@ -1,8 +1,8 @@
 {
   "$schema": "https://playground.wordpress.net/blueprint-schema.json",
   "meta": {
-    "title": "My Memories Flower Shop — showcase",
-    "description": "WordPress + WooCommerce showcase for My Memories Flower Shop",
+    "title": "My.Memories Flower Studio — showcase",
+    "description": "WordPress + WooCommerce showcase for My.Memories Flower Studio",
     "author": "Kimmy213"
   },
   "landingPage": "/",
@@ -19,7 +19,7 @@
       "step": "setSiteOptions",
       "options": {
         "permalink_structure": "/%postname%/",
-        "blogname": "My Memories Flower Shop"
+        "blogname": "My.Memories Flower Studio"
       }
     },
     {

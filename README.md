@@ -1,6 +1,6 @@
-# My Memories Flower Shop — WordPress showcase
+# My.Memories Flower Studio — WordPress showcase
 
-เว็บตัวอย่างสำหรับร้าน My Memories Flower Shop ทำด้วย **WordPress + WooCommerce** เปิดดูได้ผ่าน **WordPress Playground** (WordPress ที่รันในเบราว์เซอร์) โดยยังไม่ต้องมี hosting หรือโดเมน
+เว็บตัวอย่างสำหรับร้าน My.Memories Flower Studio ทำด้วย **WordPress + WooCommerce** เปิดดูได้ผ่าน **WordPress Playground** (WordPress ที่รันในเบราว์เซอร์) โดยยังไม่ต้องมี hosting หรือโดเมน
 
 **เปิดดู:** https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/Kimmy213/Flower-web/main/blueprint.json
 
@@ -10,7 +10,8 @@
 
 | ส่วน | รายละเอียด |
 |---|---|
-| หน้า (9 หน้าตาม brief ของร้าน) | Home, Event & Party, Event, Party, Our Customers, Client, Celebrity, Organization, Brand |
+| หน้า (9 หน้าตาม brief + เพิ่ม 19/11/2026) | Home, Event & Party, Event, Party, Our Customers, Client, Celebrity, Organization, Brand + Corporate Services (Corporate Gifting, PR & Brand Gifting, Corporate Workshop) และ About Us |
+| หน้าแรก | สไลด์บนสุด = หมวดที่ร้านติ๊ก "แสดงบนหน้าแรก" (คอลเลกชันตามเทศกาล) กดแล้วไปหน้าคอลเลกชันนั้น |
 | สินค้า | หน้า All Collections + หมวด Fresh Flower / Artificial Flower / Fruit / Occasion (หมวดไม่นับเป็นหน้า) |
 | ตัวกรอง | หมวด, หมวดย่อย, ประเภท (ช่อ กล่อง กระเช้า แจกัน พวงหรีด พวงมาลัย ชุดของขวัญ) และเรียงตามราคา |
 | สั่งซื้อ | ปิดตะกร้า ใช้ปุ่ม "สั่งทาง LINE" (ส่งชื่อและราคาสินค้าไปในแชท) และลิงก์ LINE Shopping |
@@ -35,6 +36,7 @@
 | เพิ่ม/ลบ/แก้สินค้า, ราคา | **สินค้า** (ติ๊กหมวดและประเภทข้างขวา) |
 | สินค้าขึ้น Best Sellers หน้าแรก | กดดาว ☆ ในรายการสินค้า |
 | ประเภทสินค้า (ช่อ กล่อง …) | สินค้า → **ประเภทสินค้า** ลากเรียงลำดับได้ |
+| คอลเลกชันขึ้นสไลด์บนสุดของหน้าแรก | สินค้า → **หมวดหมู่** → แก้ไข → ติ๊ก **แสดงบนหน้าแรก** (รูป = ภาพย่อ, ข้อความ = คำอธิบาย) |
 | หมวด + เมนูด้านบน + การ์ดหน้าแรก | สินค้า → **หมวดหมู่** เพิ่มหมวดแล้วขึ้นเมนูและการ์ดเอง รูปการ์ด = ภาพย่อของหมวด คำใต้การ์ด = วลีแรกของคำอธิบาย |
 | ข้อความ/รูป/แกลเลอรีในหน้า Home, Event, Customers | **หน้า** → แก้ไข (block editor) |
 | การ์ด Event/Party และ Client/Celebrity/… | รูปเด่น + ข้อความสรุป (excerpt) ของหน้าย่อยนั้น เพิ่มหน้าย่อยใหม่แล้วขึ้นการ์ดและเมนูเอง |

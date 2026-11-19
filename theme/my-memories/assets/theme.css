@@ -298,3 +298,64 @@ img { max-width: 100%; height: auto; }
   .mm-strip-btn { width: 40px; height: 40px; font-size: 24px; }
   .mm-strip-btn.next { right: 12px; }
 }
+
+/* ---------- header 2 แถว: โลโก้กลาง เมนูแถวล่าง (เมนู 9 ตัวไม่พอแถวเดียว) ---------- */
+@media (min-width: 1101px) {
+  .mm-header { padding-top: 16px; padding-bottom: 6px; }
+  .mm-header-inner { flex-direction: column !important; align-items: center !important; gap: 6px !important; }
+  .mm-header .mm-logo { align-items: center; }
+  .mm-nav { font-size: .78rem; letter-spacing: .07em; }
+  .mm-nav .wp-block-navigation__container { justify-content: center; gap: 4px 24px !important; }
+  .mm-nav .wp-block-navigation-item__content { padding-top: 8px; padding-bottom: 10px; }
+}
+
+/* ---------- สไลด์คอลเลกชันบนสุดของหน้าแรก ---------- */
+.mm-featured {
+  max-width: none !important; width: 100vw; margin: 0 calc(50% - 50vw) !important;
+}
+.mm-slider {
+  display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; user-select: none;
+}
+.mm-slider::-webkit-scrollbar { display: none; }
+.mm-slide {
+  flex: 0 0 100%; scroll-snap-align: start; display: grid; grid-template-columns: 1fr 1fr; align-items: center;
+  min-height: clamp(460px, 62vh, 640px); background: var(--mm-blush);
+}
+.mm-slide-text { padding: clamp(32px, 6vw, 80px) clamp(20px, 4vw, 56px) clamp(32px, 6vw, 80px) max(20px, calc((100vw - 1240px) / 2)); }
+.mm-slide-title { font-size: clamp(2.4rem, 5vw, 4rem); margin: .2em 0 .3em; color: var(--mm-ink); }
+.mm-slide-text .mm-lead { color: #5b4b4b; max-width: 30em; }
+.mm-slide-btn {
+  display: inline-block; margin-top: 1.2rem; text-decoration: none; border-radius: 999px; padding: .85rem 2rem;
+  background: var(--mm-rose); color: #fff !important; font-weight: 500; letter-spacing: .04em;
+}
+.mm-slide-btn:hover { background: var(--mm-rose-dark); }
+.mm-slide-media { align-self: stretch; overflow: hidden; }
+.mm-slide-media img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.mm-strip-wrap.is-slider .mm-strip-btn.prev { left: 16px; }
+.mm-strip-wrap.is-slider .mm-strip-btn.next { right: 16px; }
+.mm-strip-wrap.single .mm-strip-btn { display: none; }
+.mm-dots { position: absolute; left: 0; right: 0; bottom: 18px; display: flex; justify-content: center; gap: 8px; }
+.mm-dots button { width: 9px; height: 9px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; background: rgb(58 46 46 / .25); }
+.mm-dots button.is-on { background: var(--mm-rose-dark); width: 24px; border-radius: 6px; }
+
+/* ---------- แนะนำร้านใต้สไลด์ / About Us ---------- */
+.mm-about-teaser { text-align: center; }
+.mm-about-teaser > h2 { font-style: italic; font-weight: 500; }
+.mm-tagline { font-family: var(--mm-serif); font-style: italic; font-size: 1.35rem; color: var(--mm-rose-dark); margin-top: -.4rem !important; }
+.mm-story > p { max-width: 720px; margin-left: auto !important; margin-right: auto !important; }
+.mm-story > p.mm-lead { font-family: var(--mm-serif); font-size: clamp(1.4rem, 2.6vw, 1.9rem); line-height: 1.6; color: var(--mm-ink); text-align: center; margin-bottom: 2rem; }
+.mm-philosophy { text-align: center; }
+.mm-philosophy .mm-quote { font-family: var(--mm-serif); font-size: clamp(1.2rem, 2.2vw, 1.55rem); line-height: 1.7; max-width: 760px; margin-left: auto !important; margin-right: auto !important; color: var(--mm-ink); }
+.mm-closing { text-align: center; }
+.mm-closing .wp-block-buttons { justify-content: center; }
+
+@media (max-width: 781px) {
+  .mm-slide { grid-template-columns: 1fr; min-height: 0; }
+  .mm-slide-media { order: -1; height: 280px; }
+  .mm-slide-text { padding: 28px 20px 56px; }
+  .mm-dots { bottom: 14px; }
+}
+.mm-intro-text p.mm-tagline { font-size: 1.25rem; color: var(--mm-rose-dark); margin: -.4rem 0 1rem; }
+@media (max-width: 781px) {
+  .mm-strip-wrap.is-slider .mm-strip-btn { top: 140px; }
+}

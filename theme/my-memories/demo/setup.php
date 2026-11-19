@@ -28,7 +28,7 @@ function mm_demo_setup() {
 /* ---------------------------------------------------------------- ตั้งค่า */
 
 function mm_setup_options() {
-	update_option( 'blogname', 'My Memories Flower Shop' );
+	update_option( 'blogname', 'My.Memories Flower Studio' );
 	update_option( 'blogdescription', 'Romantic · Classy · Modern' );
 	update_option( 'timezone_string', 'Asia/Bangkok' );
 
@@ -172,12 +172,23 @@ function mm_setup_category_images( $cats, $img ) {
 	foreach ( [ 'fresh-flower' => 'blush-peony-bouquet', 'artificial-flower' => 'forever-rose-box', 'fruit' => 'fresh-fruit-basket', 'occasion' => 'rose-heart-box' ] as $cat => $image ) {
 		update_term_meta( $cats[ $cat ], 'thumbnail_id', $img[ $image ] );
 	}
+	// คอลเลกชันตามเทศกาลที่ติ๊ก "แสดงบนหน้าแรก" ไว้เป็นตัวอย่าง (ร้านติ๊กเองได้ที่ หมวดสินค้า → แก้ไข)
+	foreach ( [
+		'christmas' => [ 'christmas-door-wreath', 'Christmas Collection 2026 — พวงหรีด ช่อดอกไม้ และกล่องของขวัญโทนแดง-ทอง สำหรับเทศกาลแห่งความสุข' ],
+		'new-year'  => [ 'elegant-orchid-vase', 'New Year Collection — แจกันกล้วยไม้และกระเช้าของขวัญ ส่งความปรารถนาดีรับปีใหม่' ],
+	] as $cat => [ $image, $desc ] ) {
+		update_term_meta( $cats[ $cat ], 'thumbnail_id', $img[ $image ] );
+		update_term_meta( $cats[ $cat ], 'mm_home', 1 );
+		wp_update_term( $cats[ $cat ], 'product_cat', [ 'description' => $desc ] );
+	}
+	// รูปสำรองของสไลด์หน้าแรก เมื่อไม่มีหมวดไหนติ๊กขึ้นหน้าแรก
+	update_option( 'mm_fallback_hero', $img['hero'] );
 }
 
 // บัญชีของร้าน (shop_manager) เห็นหลังบ้านแบบย่อ ดู inc/admin.php
 function mm_setup_shop_user() {
 	if ( username_exists( 'myshop' ) ) return;
-	wp_insert_user( [ 'user_login' => 'myshop', 'user_pass' => 'mymemories2026', 'display_name' => 'My Memories', 'role' => 'shop_manager', 'locale' => 'th' ] );
+	wp_insert_user( [ 'user_login' => 'myshop', 'user_pass' => 'mymemories2026', 'display_name' => 'My.Memories', 'role' => 'shop_manager', 'locale' => 'th' ] );
 }
 
 /* ---------------------------------------------------------------- ตัวช่วยเขียน block */
@@ -239,9 +250,9 @@ function mm_b_gallery( $ids, $class = 'mm-gallery', $note = true, $align = '' ) 
 
 // หน้าผลงานแบบ ivyandpollen.com/events:
 // ① หัวข้อ + คำอธิบายซ้าย / แถวรูปแนวตั้งเลื่อนข้างขวา ② Our Projects โมเสกเต็มจอ ③ ฟอร์มส่งรายละเอียดงานทาง LINE
-function mm_b_portfolio( $title, $text, $strip, $mosaic, $form_type ) {
+function mm_b_portfolio( $title, $text, $strip, $mosaic, $form_type, $tagline = '' ) {
 	$intro = "<!-- wp:group {\"align\":\"full\",\"className\":\"mm-intro\",\"layout\":{\"type\":\"default\"}} -->\n<div class=\"wp-block-group alignfull mm-intro\">"
-		. "<!-- wp:group {\"className\":\"mm-intro-text\",\"layout\":{\"type\":\"default\"}} -->\n<div class=\"wp-block-group mm-intro-text\">" . mm_b_h( $title, 1 ) . mm_b_p( $text ) . "</div>\n<!-- /wp:group -->\n"
+		. "<!-- wp:group {\"className\":\"mm-intro-text\",\"layout\":{\"type\":\"default\"}} -->\n<div class=\"wp-block-group mm-intro-text\">" . mm_b_h( $title, 1 ) . ( $tagline ? mm_b_p( $tagline, 'mm-tagline' ) : '' ) . mm_b_p( $text ) . "</div>\n<!-- /wp:group -->\n"
 		. mm_b_gallery( $strip, 'mm-strip', false )
 		. "</div>\n<!-- /wp:group -->\n";
 	$projects = mm_b_h( 'Our Projects' ) . mm_b_gallery( $mosaic, 'mm-mosaic', false, 'full' ) . mm_b_p( 'ภาพตัวอย่าง จะเปลี่ยนเป็นผลงานจริงของร้าน', 'mm-note' );
@@ -275,7 +286,8 @@ function mm_setup_pages( $img ) {
 	$customers_url   = home_url( '/our-customers/' );
 
 	$pages['home'] = mm_page( 'home', 'Home',
-		mm_b_cover( $img['hero'], 'My Memories Flower Shop', 'ดอกไม้สำหรับทุกความทรงจำ', 'ช่อดอกไม้ กล่องดอกไม้ กระเช้า และงานดอกไม้สำหรับอีเวนต์ จัดด้วยมือในสไตล์ Romantic · Classy · Modern', [ [ 'ดูคอลเลกชัน', $shop, 'fill' ], $line ], 620 )
+		mm_b_sc( '[mm_featured_collections]' )
+		. mm_b_section( mm_b_intro( 'My.Memories Flower Studio', 'Every Flower Holds a Memory.', 'เราเชื่อว่าดอกไม้ไม่ได้เป็นเพียงของขวัญ แต่เป็นสิ่งที่ช่วยถ่ายทอดความรู้สึก และเก็บรักษาความทรงจำของช่วงเวลาสำคัญในชีวิต' ) . mm_b_buttons( [ [ 'About Us', home_url( '/about-us/' ), 'outline' ], [ 'ดูคอลเลกชันทั้งหมด', $shop, 'fill' ] ] ), 'mm-about-teaser' )
 		. mm_b_section( mm_b_intro( 'Our Collections', 'เลือกตามหมวด' ) . mm_b_sc( '[mm_collections]' ) )
 		. mm_b_section( mm_b_intro( 'Best Sellers', 'ช่อยอดนิยมของร้าน' ) . mm_b_sc( '[products visibility="featured" limit="8" columns="4" orderby="menu_order" order="ASC"]' ) . mm_b_buttons( [ [ 'See more collections', $shop, 'fill' ] ] ), 'mm-tint' )
 		. mm_b_section( mm_b_intro( 'Our Customers', 'ลูกค้าที่ไว้ใจเรา', 'ดูแลดอกไม้ให้ทั้งลูกค้าทั่วไป เซเลบริตี้ องค์กร และแบรนด์' ) . mm_b_sc( '[mm_subpages parent="our-customers"]' ) )
@@ -321,6 +333,50 @@ function mm_setup_pages( $img ) {
 			. mm_b_section( mm_b_intro( 'Gallery', 'ผลงาน · ' . $th ) . mm_b_gallery( array_slice( array_values( array_filter( $img, fn( $k ) => ! str_starts_with( $k, 'customer' ) && ! in_array( $k, [ 'hero', 'event', 'party' ], true ), ARRAY_FILTER_USE_KEY ) ), $order * 3, 6 ) ) )
 			. $cta( 'อยากให้เราดูแลดอกไม้ของคุณ', 'ทักมาคุยรายละเอียดได้ทุกวัน' ), $pages['our-customers'], $order++, $img[ $cover ], $th );
 	}
+
+	// Corporate Services (ร้านเริ่มทำ B2B, 19/11/2026) ข้อความจากร้าน ยกเว้น Corporate Gifting ที่ Claude ร่าง
+	$pages['corporate-services'] = mm_page( 'corporate-services', 'Corporate Services',
+		mm_b_cover( $img['customer-brand'], 'Corporate Services', 'Floral Experiences for Your Brand', 'บริการออกแบบและจัดดอกไม้สำหรับองค์กร ที่ใส่ใจทั้งความสวยงาม รายละเอียด และเอกลักษณ์ของแบรนด์ เราพร้อมสร้างสรรค์ผลงานดอกไม้สำหรับทุกโอกาสสำคัญ ตั้งแต่การมอบของขวัญให้ลูกค้าและพนักงาน ไปจนถึงแคมเปญประชาสัมพันธ์และกิจกรรมพิเศษขององค์กร' )
+		. mm_b_section( mm_b_intro( 'Services', 'บริการสำหรับองค์กร' ) . mm_b_sc( '[mm_subpages parent="corporate-services"]' ) )
+		. $cta( 'ปรึกษางานสำหรับองค์กร', 'บอกจำนวน งบประมาณ และวันที่ต้องการ ร้านจะส่งไอเดียและใบเสนอราคากลับไป' ), 0, 3, $img['customer-organization'], 'ของขวัญองค์กร PR และเวิร์กช็อป' );
+
+	$corporate = [
+		'corporate-gifting'  => [ 'Corporate Gifting', 'Corporate<br>Gifting', 'Thoughtful Gifts for Every Occasion',
+			'บริการออกแบบของขวัญดอกไม้สำหรับองค์กร ทั้งของขวัญขอบคุณลูกค้า ของขวัญพนักงาน และของขวัญตามเทศกาล ปรับดีไซน์ สี และการ์ดข้อความให้เข้ากับเอกลักษณ์ของแบรนด์ รองรับการสั่งจำนวนมากและจัดส่งหลายสถานที่',
+			'ของขวัญลูกค้าและพนักงาน', [ 'pearl-white-box', 'rose-heart-box', 'wellness-gift-set', 'fresh-fruit-basket', 'mothers-jasmine-box' ] ],
+		'pr-brand-gifting'   => [ 'PR & Brand Gifting', 'PR &amp; Brand<br>Gifting', 'Bringing Your Brand to Life Through Flowers',
+			'บริการออกแบบดอกไม้สำหรับแคมเปญประชาสัมพันธ์ การเปิดตัวสินค้า และการส่งของขวัญให้สื่อมวลชนหรืออินฟลูเอนเซอร์ โดยคำนึงถึง Brand Identity แนวคิดของแคมเปญ และรายละเอียดของผลิตภัณฑ์ เพื่อถ่ายทอดเรื่องราวของแบรนด์ผ่านงานดอกไม้ที่มีเอกลักษณ์',
+			'แคมเปญ เปิดตัวสินค้า อินฟลูเอนเซอร์', [ 'customer-brand', 'forever-rose-box', 'blush-peony-bouquet', 'everlasting-vase', 'silk-pastel-bouquet' ] ],
+		'corporate-workshop' => [ 'Corporate Workshop', 'Corporate<br>Workshop', 'Create, Connect &amp; Inspire',
+			'กิจกรรมเวิร์กช็อปจัดดอกไม้สำหรับองค์กร เหมาะสำหรับ Team Building กิจกรรมพนักงาน กิจกรรมขอบคุณลูกค้า และโอกาสพิเศษต่าง ๆ สามารถปรับรูปแบบกิจกรรม ระยะเวลา และรูปแบบชิ้นงานให้เหมาะกับจำนวนผู้เข้าร่วมและความต้องการของแต่ละองค์กร',
+			'Team Building และกิจกรรมองค์กร', [ 'party', 'secret-garden-basket', 'sunny-days', 'jasmine-garland', 'classic-red-romance' ] ],
+	];
+	$order = 0;
+	foreach ( $corporate as $slug => [ $title, $heading, $tagline, $text, $excerpt, $strip ] ) {
+		$strip_ids = array_map( fn( $k ) => $img[ $k ], $strip );
+		$pages[ $slug ] = mm_page( $slug, $title,
+			mm_b_portfolio( $heading, $text, $strip_ids, array_slice( array_merge( array_slice( $works, $order * 5 ), $works ), 0, 15 ), $title, $tagline ),
+			$pages['corporate-services'], $order++, $strip_ids[0], $excerpt );
+	}
+
+	// About Us ข้อความจากร้านทั้งหมด (19/11/2026)
+	$pages['about-us'] = mm_page( 'about-us', 'About Us',
+		mm_b_cover( $img['hero'], 'About Us', 'My.Memories Flower Studio', 'Every Flower Holds a Memory.' )
+		. mm_b_section(
+			mm_b_p( 'เราเชื่อว่าดอกไม้ไม่ได้เป็นเพียงของขวัญ แต่เป็นสิ่งที่ช่วยถ่ายทอดความรู้สึก และเก็บรักษาความทรงจำของช่วงเวลาสำคัญในชีวิต', 'mm-lead' )
+			. mm_b_p( 'My.Memories Flower Studio เกิดขึ้นจากความตั้งใจที่จะสร้างสรรค์งานดอกไม้ที่มีความหมายมากกว่าความสวยงาม เราให้ความสำคัญกับการเลือกดอกไม้ การจับคู่สี รูปทรง และรายละเอียดเล็ก ๆ ในทุกชิ้นงาน เพื่อให้ดอกไม้แต่ละช่อสามารถถ่ายทอดความรู้สึกของผู้มอบไปถึงผู้รับได้อย่างดีที่สุด' )
+			. mm_b_p( 'ไม่ว่าจะเป็นช่อดอกไม้สำหรับคนพิเศษ ของขวัญในวันสำคัญ หรือการออกแบบดอกไม้สำหรับแบรนด์และองค์กร เราเชื่อว่าทุกโอกาสมีเรื่องราวเป็นของตัวเอง และสมควรได้รับการออกแบบอย่างใส่ใจ' ),
+			'mm-story' )
+		. mm_b_section(
+			mm_b_p( 'Our Philosophy', 'mm-eyebrow' )
+			. mm_b_p( 'เราไม่ได้ต้องการเพียงสร้างสรรค์ดอกไม้ที่สวยงาม แต่ต้องการเป็นส่วนหนึ่งของความทรงจำดี ๆ ที่เกิดขึ้นระหว่างผู้คน', 'mm-quote' )
+			. mm_b_p( 'เพราะสำหรับเรา ดอกไม้หนึ่งช่ออาจอยู่ได้เพียงช่วงเวลาหนึ่ง แต่ความรู้สึกและความทรงจำที่มอบให้กัน สามารถคงอยู่ได้ยาวนานกว่านั้น', 'mm-quote' ),
+			'mm-tint mm-philosophy' )
+		. mm_b_section(
+			mm_b_h( 'My.Memories Flower Studio' ) . mm_b_p( 'Flowers for Moments Worth Remembering.', 'mm-tagline' )
+			. mm_b_buttons( [ [ 'ดูคอลเลกชัน', $shop, 'fill' ], $line ] ),
+			'mm-closing' ),
+		0, 4, $img['hero'], 'เรื่องราวของร้าน' );
 
 	update_option( 'show_on_front', 'page' );
 	update_option( 'page_on_front', $pages['home'] );
