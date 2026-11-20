@@ -1,33 +1,46 @@
 <?php
 /**
- * สร้างข้อมูลตัวอย่างของเว็บโชว์เคส: ตั้งค่าร้าน, หมวด, สินค้า, หน้า และเมนู
- * เรียกครั้งเดียวจาก blueprint:  require get_theme_file_path('demo/setup.php'); mm_demo_setup();
+ * ติดตั้งโครงเว็บ: ตั้งค่าร้าน, หมวด, ประเภท, หน้า และรูป (+ สินค้าตัวอย่างในโหมด showcase)
+ *   showcase (Playground): blueprint เรียก mm_demo_setup()
+ *   เว็บจริง (hosting):     ปุ่มใน หลังบ้าน → เครื่องมือ → ติดตั้งโครงเว็บ (inc/admin.php) เรียก mm_site_setup( false )
  */
 
 function mm_demo_setup() {
-	if ( get_option( 'mm_demo_done' ) ) return;
+	mm_site_setup( true );
+}
+
+// $demo = true  : showcase มีสินค้าตัวอย่าง 18 ชิ้น บัญชีร้าน myshop คอลเลกชันตัวอย่างขึ้นหน้าแรก และเปิดเว็บทันที
+// $demo = false : เว็บจริง ไม่มีสินค้าและบัญชีทดสอบ ปิดแถบ Showcase และเปิดโหมด Coming soon ไว้จนกว่าจะเปิดเว็บ
+// รูปในหน้าต่าง ๆ ยังเป็นรูปวาดตัวอย่างทั้งสองโหมด รอเปลี่ยนเป็นรูปจริงของร้าน
+function mm_site_setup( $demo = true ) {
+	if ( get_option( 'mm_demo_done' ) ) return false;
 	require_once ABSPATH . 'wp-admin/includes/image.php';
 	require_once ABSPATH . 'wp-admin/includes/post.php';
-	wp_set_current_user( 1 );
+	if ( ! get_current_user_id() ) wp_set_current_user( 1 );
 	$GLOBALS['wp_rewrite']->set_permalink_structure( '/%postname%/' );
 	if ( wc_get_page_id( 'shop' ) < 1 ) WC_Install::create_pages();
 
-	mm_setup_options();
+	mm_setup_options( $demo );
 	$types = mm_setup_types();
 	$cats  = mm_setup_categories();
 	$imgs  = mm_setup_images();
-	mm_setup_products( $cats, $types, $imgs );
-	mm_setup_category_images( $cats, $imgs );
+	if ( $demo ) mm_setup_products( $cats, $types, $imgs );
+	mm_setup_category_images( $cats, $imgs, $demo );
 	mm_setup_pages( $imgs );
-	mm_setup_shop_user();
+	if ( $demo ) {
+		mm_setup_shop_user();
+	} else {
+		update_option( 'mm_shop', array_merge( mm_shop(), [ 'show_bar' => 0 ] ) );
+	}
 
 	update_option( 'mm_demo_done', 1 );
 	flush_rewrite_rules();
+	return true;
 }
 
 /* ---------------------------------------------------------------- ตั้งค่า */
 
-function mm_setup_options() {
+function mm_setup_options( $demo = true ) {
 	update_option( 'blogname', 'My.Memories Flower Studio' );
 	update_option( 'blogdescription', 'Romantic · Classy · Modern' );
 	update_option( 'timezone_string', 'Asia/Bangkok' );
@@ -38,7 +51,7 @@ function mm_setup_options() {
 		'woocommerce_price_num_decimals'     => 0,
 		'woocommerce_price_thousand_sep'     => ',',
 		'woocommerce_default_country'        => 'TH:TH-10',
-		'woocommerce_coming_soon'            => 'no',
+		'woocommerce_coming_soon'            => $demo ? 'no' : 'yes', // เว็บจริง: คนทั่วไปเห็นหน้า Coming soon จนกว่าจะเปิดเว็บ
 		'woocommerce_store_pages_only'       => 'no',
 		'woocommerce_enable_reviews'         => 'no',
 		'woocommerce_attribute_lookup_enabled' => 'no',
@@ -168,12 +181,12 @@ function mm_setup_products( $cats, $types, $imgs ) {
 }
 
 // รูปการ์ดหมวดหน้าแรก = "ภาพย่อ" ของหมวด (ร้านเปลี่ยนเองได้ที่ หมวดสินค้า → แก้ไข)
-function mm_setup_category_images( $cats, $img ) {
+function mm_setup_category_images( $cats, $img, $demo = true ) {
 	foreach ( [ 'fresh-flower' => 'blush-peony-bouquet', 'artificial-flower' => 'forever-rose-box', 'fruit' => 'fresh-fruit-basket', 'occasion' => 'rose-heart-box' ] as $cat => $image ) {
 		update_term_meta( $cats[ $cat ], 'thumbnail_id', $img[ $image ] );
 	}
-	// คอลเลกชันตามเทศกาลที่ติ๊ก "แสดงบนหน้าแรก" ไว้เป็นตัวอย่าง (ร้านติ๊กเองได้ที่ หมวดสินค้า → แก้ไข)
-	foreach ( [
+	// คอลเลกชันตามเทศกาลที่ติ๊ก "แสดงบนหน้าแรก" ไว้เป็นตัวอย่าง (ร้านติ๊กเองได้ที่ หมวดสินค้า → แก้ไข) เว็บจริงไม่ติ๊กให้
+	foreach ( ! $demo ? [] : [
 		'christmas' => [ 'banner-christmas', 'Christmas Collection 2026 — พวงหรีด ช่อดอกไม้ และกล่องของขวัญโทนแดง-ทอง สำหรับเทศกาลแห่งความสุข' ],
 		'new-year'  => [ 'banner-new-year', 'New Year Collection — แจกันกล้วยไม้และกระเช้าของขวัญ ส่งความปรารถนาดีรับปีใหม่' ],
 	] as $cat => [ $image, $desc ] ) {

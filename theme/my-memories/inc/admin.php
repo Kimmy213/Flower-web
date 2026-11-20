@@ -75,6 +75,55 @@ function mm_shop_page() {
 	echo '</form></div>';
 }
 
+/* ---------------------------------------------------------------- ติดตั้งโครงเว็บจริง (admin เท่านั้น) */
+
+// บน hosting จริงไม่มี blueprint จึงติดตั้งหน้า หมวด และเมนูด้วยปุ่มนี้ครั้งเดียว (ไม่มีสินค้าตัวอย่าง)
+add_action( 'admin_menu', function () {
+	add_management_page( 'ติดตั้งโครงเว็บ', 'ติดตั้งโครงเว็บ', 'manage_options', 'mm-install', 'mm_install_page' );
+} );
+
+add_action( 'admin_notices', function () {
+	$screen = get_current_screen();
+	if ( ! current_user_can( 'manage_options' ) || get_option( 'mm_demo_done' ) || ( $screen && 'tools_page_mm-install' === $screen->id ) ) return;
+	printf( '<div class="notice notice-warning"><p><strong>ยังไม่ได้ติดตั้งโครงเว็บ My.Memories</strong> — ไปที่ <a href="%s">เครื่องมือ → ติดตั้งโครงเว็บ</a></p></div>', esc_url( admin_url( 'tools.php?page=mm-install' ) ) );
+} );
+
+function mm_install_page() {
+	$msg = '';
+	if ( 'POST' === $_SERVER['REQUEST_METHOD'] && check_admin_referer( 'mm_install' ) && ! get_option( 'mm_demo_done' ) ) {
+		if ( ! class_exists( 'WooCommerce' ) ) {
+			$msg = '<div class="notice notice-error"><p>ต้องติดตั้งและเปิดใช้ปลั๊กอิน WooCommerce ก่อน</p></div>';
+		} else {
+			set_time_limit( 300 );
+			require_once get_theme_file_path( 'demo/setup.php' );
+			mm_site_setup( false );
+			$msg = '<div class="notice notice-success"><p>ติดตั้งโครงเว็บเรียบร้อยแล้ว</p></div>';
+		}
+	}
+	echo '<div class="wrap mm-admin"><h1>ติดตั้งโครงเว็บ My.Memories</h1>' . $msg;
+	if ( get_option( 'mm_demo_done' ) ) {
+		echo '<p>ติดตั้งแล้ว ขั้นต่อไป:</p><ol>'
+			. '<li>ตั้งภาษาไทยที่ การตั้งค่า → ทั่วไป → ภาษาของเว็บไซต์ (ถ้ายังไม่ได้ตั้ง)</li>'
+			. '<li>ใส่ข้อมูลร้านที่เมนู <a href="' . esc_url( admin_url( 'admin.php?page=mm-shop' ) ) . '">ข้อมูลร้าน</a></li>'
+			. '<li>สร้างบัญชีให้ร้านที่ ผู้ใช้ → เพิ่มใหม่ เลือกบทบาท <strong>Shop manager</strong> (ร้านจะเห็นหลังบ้านแบบย่อ)</li>'
+			. '<li>นำเข้าสินค้า แล้วเปลี่ยนรูปตัวอย่างในหน้าต่าง ๆ เป็นรูปจริง</li>'
+			. '<li>พร้อมเปิดเว็บ: WooCommerce → การตั้งค่า → การมองเห็นเว็บไซต์ → <strong>Live</strong> (ตอนนี้คนทั่วไปเห็นหน้า Coming soon)</li>'
+			. '</ol></div>';
+		return;
+	}
+	echo '<p>กดปุ่มนี้<strong>ครั้งเดียว</strong>บนเว็บที่เพิ่งติดตั้ง WordPress ใหม่ ระบบจะสร้าง:</p><ul style="list-style:disc;padding-left:20px">'
+		. '<li>หน้าทั้งหมด: Home, Event & Party, Event, Party, Our Customers + 4 หน้าย่อย, Corporate Services + 3 หน้าย่อย, About Us, All Collections</li>'
+		. '<li>หมวดสินค้า 4 หมวดหลัก + หมวดย่อย และประเภทสินค้า 7 ประเภท</li>'
+		. '<li>ตั้งค่าร้าน: สกุลเงินบาท, ลิงก์แบบ /ชื่อหน้า/, ปิดตะกร้า (สั่งทาง LINE)</li>'
+		. '<li>รูปวาดตัวอย่างในหน้าต่าง ๆ (รอเปลี่ยนเป็นรูปจริง)</li>'
+		. '</ul><p><strong>ไม่สร้างสินค้าตัวอย่างและไม่สร้างบัญชีผู้ใช้</strong> และจะเปิดโหมด <strong>Coming soon</strong> ไว้ คนทั่วไปยังไม่เห็นเว็บจนกว่าจะเปิด</p>'
+		. '<p>ระบบจะลบโพสต์ "Hello world" และหน้า "Sample Page" ที่ WordPress สร้างมาให้</p>'
+		. '<form method="post">';
+	wp_nonce_field( 'mm_install' );
+	submit_button( 'ติดตั้งโครงเว็บ', 'primary large' );
+	echo '</form></div>';
+}
+
 /* ---------------------------------------------------------------- หมวดสินค้า: ติ๊ก "แสดงบนหน้าแรก" */
 
 // หมวดที่ติ๊กจะขึ้นสไลด์บนสุดของหน้าแรก ([mm_featured_collections] ใน functions.php)
